@@ -14,6 +14,14 @@ var twitterRestClient = new Twitter.RestClient(
   conf.access_token,
   conf.access_token_secret
 );
+var Tumblr = require('tumblrwks');
+var tumblr = new Tumblr({
+    consumerKey:    conf.tumblr_consumer_key,
+    consumerSecret: conf.tumblr_consumer_secret,
+    accessToken:    conf.tumblr_access_token,
+    accessSecret:   conf.tumblr_access_token_secret
+  }, "museumbot.tumblr.com"
+);
 
 var baseUrl = 'http://www.metmuseum.org/collection/the-collection-online/search?ft=*&ao=on&noqs=true&rpp=30&pg=';
 
@@ -51,7 +59,7 @@ function generate() {
             var stream = fs.createWriteStream('hires.jpg');
             stream.on('close', function() {
               console.log('done');
-              dfd.resolve(name + ' ' + thingUrl);
+              dfd.resolve(name + ' ' + thingUrl, bigImageUrl, '<a href="' + thingUrl + '">' + name + '</a><br><br>The Metropolitan Museum of Art');
             });
             var r = request(bigImageUrl).pipe(stream);
           }
@@ -74,7 +82,7 @@ function generate() {
 }
 
 function tweet() {
-  generate().then(function(myTweet) {
+  generate().then(function(myTweet, bigImageUrl, tumblrHtml) {
     if (!wordfilter.blacklisted(myTweet)) {
       console.log(myTweet);
       twitterRestClient.statusesUpdateWithMedia({
@@ -87,6 +95,14 @@ function tweet() {
         }
         if (result) {
           console.log('yay it worked???');
+          // Tumblr it
+          tumblr.post('/post', {
+            type: 'photo',
+            source: bigImageUrl,
+            caption: tumblrHtml,
+            }, function(err, json){
+            console.log(json, err);
+          });
         }
       });
     }

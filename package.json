@@ -30,7 +30,8 @@
     "wordfilter": "0.1.3",
     "request": "~2.27.0",
     "cheerio": "~0.12.2",
-    "node-twitter": "https://github.com/dariusk/node-twitter/archive/master.tar.gz" 
+    "node-twitter": "https://github.com/dariusk/node-twitter/archive/master.tar.gz",
+    "tumblrwks": "~0.2.0"
   },
   "devDependencies": {},
   "keywords": []
