@@ -6,6 +6,21 @@ The `index.js` file only runs once. It runs a search on the Met's collection thr
 
 I run this on a cron job on a server.
 
+There is a "missing" file in this repo, `config.js`. You need to set it up yourself, and it should look like this:
+
+```javascript
+module.exports = {
+  consumer_key:               'YOUR_AUTH_STUFF_HERE',
+  consumer_secret:            'YOUR_AUTH_STUFF_HERE',
+  access_token:               'YOUR_AUTH_STUFF_HERE',
+  access_token_secret:        'YOUR_AUTH_STUFF_HERE',
+  tumblr_consumer_key:        'YOUR_AUTH_STUFF_HERE',
+  tumblr_consumer_secret:     'YOUR_AUTH_STUFF_HERE',
+  tumblr_access_token:        'YOUR_AUTH_STUFF_HERE',
+  tumblr_access_token_secret: 'YOUR_AUTH_STUFF_HERE'
+};
+```
+
 ## License
 Copyright (c) 2014 Darius Kazemi  
 Licensed under the MIT license.
