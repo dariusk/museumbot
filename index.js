@@ -46,6 +46,7 @@ function generate() {
       console.log($pics.length);
       var $pic = $pics.eq(Math.floor(Math.random()*$pics.length));
       var name = $pic.find('img').attr('alt');
+      var shortName = name.substr(0,140);
       var thumbUrl = $pic.find('img').attr('src');
       var thingUrl = 'http://www.metmuseum.org' + $pic.attr('href');
       console.log(name, thumbUrl, thingUrl);
@@ -59,7 +60,7 @@ function generate() {
             var stream = fs.createWriteStream('hires.jpg');
             stream.on('close', function() {
               console.log('done');
-              dfd.resolve(name + ' ' + thingUrl, bigImageUrl, '<a href="' + thingUrl + '">' + name + '</a><br><br>The Metropolitan Museum of Art');
+              dfd.resolve(shortName + ' ' + thingUrl, bigImageUrl, '<a href="' + thingUrl + '">' + name + '</a><br><br>The Metropolitan Museum of Art');
             });
             var r = request(bigImageUrl).pipe(stream);
           }
