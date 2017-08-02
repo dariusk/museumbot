@@ -24,7 +24,7 @@ var tumblr = new Tumblr({
 );
 
 //var baseUrl = 'http://www.metmuseum.org/collection/the-collection-online/search?ft=*&ao=on&noqs=true&rpp=30&pg=';
-var baseUrl = 'http://www.metmuseum.org/api/collection/collectionlisting?artist=&department=&era=&geolocation=&material=&showOnly=withImage&sortBy=AccessionNumber&sortOrder=asc&page=';
+var baseUrl = 'http://www.metmuseum.org/api/collection/collectionlisting?artist=&department=&era=&geolocation=&material=&showOnly=withImage%7Copenaccess&sortBy=AccessionNumber&sortOrder=asc&offset=';
 console.log('hi');
 
 Array.prototype.pick = function() {
@@ -40,7 +40,7 @@ function generate() {
   var dfd = new _.Deferred();
 
 console.log('going to req');
-  var url = baseUrl + Math.floor(Math.random()*21200);
+  var url = baseUrl + Math.floor(Math.random()*209054);
   request(url, function (error, response, body) {
     console.log('reqed',error, response.statusCode);
     if (!error && response.statusCode == 200) {
