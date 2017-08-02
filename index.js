@@ -23,7 +23,7 @@ var tumblr = new Tumblr({
   }, "museumbot.tumblr.com"
 );
 
-var baseUrl = 'http://www.metmuseum.org/collection/the-collection-online/search?ft=*&ao=on&noqs=true&rpp=30&pg=';
+var baseUrl = 'http://www.metmuseum.org/api/collection/collectionlisting?artist=&department=&era=&geolocation=&material=&showOnly=withImage%7Copenaccess&sortBy=AccessionNumber&sortOrder=asc&offset=';
 
 Array.prototype.pick = function() {
   return this[Math.floor(Math.random()*this.length)];
@@ -37,48 +37,35 @@ Array.prototype.pickRemove = function() {
 function generate() {
   var dfd = new _.Deferred();
 
-  var url = baseUrl + Math.floor(Math.random()*8758);
+console.log('going to req');
+  var url = baseUrl + Math.floor(Math.random()*209054);
   request(url, function (error, response, body) {
+    console.log('reqed',error, response.statusCode);
     if (!error && response.statusCode == 200) {
-      var result = 'yo';
-      var $ = cheerio.load(body);
-      var $pics = $('.list-view-thumbnail > a');
-      console.log($pics.length);
-      var $pic = $pics.eq(Math.floor(Math.random()*$pics.length));
-      var name = $pic.find('img').attr('alt');
-      var shortName = name.substr(0,140);
-      var thumbUrl = $pic.find('img').attr('src');
-      var thingUrl = 'http://www.metmuseum.org' + $pic.attr('href');
-      console.log(name, thumbUrl, thingUrl);
+      var data = JSON.parse(body).results.pick();
+      console.log(data);
+      var name = data.title;
+      var thingUrl = 'http://www.metmuseum.org' + data.url;
+      var bigImageUrl = 'http://images.metmuseum.org/CRDImages/' + data.largeImage;
       // go to page for thing
-      request(thingUrl, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          var $$ = cheerio.load(body);
-          var bigImageUrl = $$('.download').attr('href');
-          console.log(bigImageUrl);
-          if (bigImageUrl) {
-            var stream = fs.createWriteStream('hires.jpg');
-            stream.on('close', function() {
-              console.log('done');
-              dfd.resolve(shortName + ' ' + thingUrl, bigImageUrl, '<a href="' + thingUrl + '">' + name + '</a><br><br>The Metropolitan Museum of Art');
-            });
-            var r = request(bigImageUrl).pipe(stream);
-          }
-          else {
-            dfd.reject();
-            tweet();
-          }
-        }
-        else {
-          dfd.reject();
-        }
-      });
+      if (data.largeImage) {
+        var stream = fs.createWriteStream('hires.jpg');
+        stream.on('close', function() {
+          console.log('done');
+          dfd.resolve(name + ' ' + thingUrl, bigImageUrl, '<a href="' + thingUrl + '">' + ent.decode(name) + '</a><br><br>The Metropolitan Museum of Art');
+        });
+        var r = request(bigImageUrl).pipe(stream);
+      }
+      else {
+        dfd.reject();
+        tweet();
+      }
     }
     else {
       dfd.reject();
+      tweet();
     }
   });
-
   return dfd.promise();
 }
 
@@ -87,7 +74,7 @@ function tweet() {
     if (!wordfilter.blacklisted(myTweet)) {
       console.log(myTweet);
       twitterRestClient.statusesUpdateWithMedia({
-        'status': myTweet,
+        'status': ent.decode(myTweet),
         'media[]': 'hires.jpg'
       },
       function(error, result) {
